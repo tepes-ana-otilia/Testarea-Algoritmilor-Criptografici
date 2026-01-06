@@ -1,7 +1,7 @@
 """
-Suite Completă de Testare pentru Algoritmul RSA - TOATE CELE 8 TIPURI
+Set de Teste pentru Algoritmul RSA
 
-Acest script implementează o metodologie completă de testare a RSA:
+Acest cod cuprinde o metodologie completă de testare a RSA:
 1. Evaluarea complexității algoritmului
 2. Testarea rezistenței la atacuri criptanalitice
 3. Testarea manuală a vulnerabilităților
@@ -9,7 +9,7 @@ Acest script implementează o metodologie completă de testare a RSA:
 5. Testarea bazată pe standarde
 6. Testarea performanței
 7. Testarea integrității
-8. Analiza entropiei și aleatorietății
+8. Analiza entropiei și randomizării
 """
 
 from Crypto.PublicKey import RSA
@@ -464,15 +464,15 @@ class RSACompleteTesting:
 
         for size in key_sizes_tested:
             if size < 2048:
-                status = "✗ NON-COMPLIANT"
+                status = "✗ NECONFORM"
                 compliant = False
                 reason = "Sub minim 2048 biți"
             elif size >= 3072:
-                status = "✓ COMPLIANT (112+ biți securitate)"
+                status = "✓ CONFORM (112+ biți securitate)"
                 compliant = True
                 reason = "Îndeplinește cerințe până în 2030+"
             else:
-                status = "✓ COMPLIANT (128 biți securitate)"
+                status = "✓ CONFORM (128 biți securitate)"
                 compliant = True
                 reason = "Acceptabil până în 2030"
 
@@ -486,7 +486,7 @@ class RSACompleteTesting:
 
         # Verificare exponent public
         if key.e >= 2**16 + 1:  # 65537
-            print(f"✓ Exponent public: {key.e} (COMPLIANT)")
+            print(f"✓ Exponent public: {key.e} (CONFORM)")
             compliance_results["FIPS_exponent"] = True
         else:
             print(f"✗ Exponent public prea mic: {key.e}")
@@ -495,7 +495,7 @@ class RSACompleteTesting:
         # Verificare dimensiune modul
         n_bit_length = key.n.bit_length()
         if n_bit_length >= 2048:
-            print(f"✓ Dimensiune modul: {n_bit_length} biți (COMPLIANT)")
+            print(f"✓ Dimensiune modul: {n_bit_length} biți (CONFORM)")
             compliance_results["FIPS_modulus"] = True
         else:
             print(f"✗ Dimensiune modul: {n_bit_length} biți (sub 2048)")
@@ -712,7 +712,7 @@ class RSACompleteTesting:
         print(f"Teste trecute: {sum(integrity_tests)}/{len(integrity_tests)}")
 
     # ============================================================================
-    # TESTAREA 8: ENTROPIA ȘI ALEATORIETATEA
+    # TESTAREA 8: ENTROPIA ȘI RANDOMIZARE
     # ============================================================================
 
     def test_8_entropy_and_randomness(self, key_size=2048, num_keys=100):
@@ -720,10 +720,10 @@ class RSACompleteTesting:
         Analizează calitatea cheilor:
         - Entropie Shannon
         - Distribuție biți
-        - Surse de aleatorietate
+        - Surse de randomizare
         """
         print("\n" + "=" * 80)
-        print("TESTAREA 8: ENTROPIA ȘI ALEATORIETATEA")
+        print("TESTAREA 8: ENTROPIA ȘI RANDOMIZARE")
         print("=" * 80)
 
         print(f"\nGenerare {num_keys} chei de {key_size} biți...")
@@ -788,13 +788,9 @@ class RSACompleteTesting:
             f"Interpretare: {'✓ Distribuție uniformă' if chi_square < 20 else '⚠ Posibile neuniformități'}"
         )
 
-        # Test 8.4: Sursă de aleatorietate
-        print("\n--- 8.4 Sursă Aleatorietate ---")
+        # Test 8.4: Sursă de randomizare
+        print("\n--- 8.4 Sursă Randomizare ---")
         print("Bibliotecă: PyCryptodome (Crypto.Random)")
-        print("Backend: ")
-        print("  - Linux/Unix: /dev/urandom (CSPRNG)")
-        print("  - Windows: CryptGenRandom (CSPRNG)")
-        print("✓ Sursă criptografic sigură (CSPRNG)")
 
         # Test validare prime
         if primes_p and primes_q:
@@ -932,7 +928,7 @@ class RSACompleteTesting:
             )
 
         # Testarea 8
-        print("\n8. ENTROPIE ȘI ALEATORIETATE:")
+        print("\n8. ENTROPIE ȘI RANDOMIZARE:")
         if self.results["entropy"]:
             ent = self.results["entropy"]
             print(
@@ -955,7 +951,7 @@ class RSACompleteTesting:
 def main():
     """Execută toate cele 8 tipuri de testare"""
     print("=" * 80)
-    print("SUITE COMPLETĂ DE TESTARE RSA")
+    print("SET COMPLET DE TESTARE RSA")
     print("Implementare completă a tuturor celor 8 tipuri de testare")
     print("=" * 80)
 
@@ -983,7 +979,7 @@ def main():
         # Testarea 7: Integritate
         suite.test_7_integrity()
 
-        # Testarea 8: Entropie și aleatorietate
+        # Testarea 8: Entropie și randomizare
         suite.test_8_entropy_and_randomness(key_size=2048, num_keys=50)
 
         # Raport final complet
