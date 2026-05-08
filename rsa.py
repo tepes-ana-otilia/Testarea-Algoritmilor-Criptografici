@@ -20,11 +20,13 @@ from Crypto.Hash import SHA256, SHA512, HMAC
 from Crypto.Signature import pkcs1_15
 import time
 import math
-import hashlib
-import secrets
 import numpy as np
 from collections import Counter
 import random
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet
+import os
+from reportlab.platypus import Image
 
 
 class RSACompleteTesting:
@@ -41,20 +43,11 @@ class RSACompleteTesting:
         }
         self.test_keys = {}
 
-    # ============================================================================
-    # TESTAREA 1: EVALUAREA COMPLEXITĂȚII ALGORITMULUI
-    # ============================================================================
-
     def test_1_complexity_evaluation(self):
-        """
-        Evaluează complexitatea algoritmului prin:
-        - Analiza matematică a complexității factorizării
-        - Simularea atacurilor brute-force
-        - Estimarea resurselor computaționale necesare
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 1: EVALUAREA COMPLEXITĂȚII ALGORITMULUI")
-        print("=" * 80)
+
+        print("\n" + "=" * 50)
+        print("TESTUL 1: EVALUAREA COMPLEXITĂȚII ALGORITMULUI")
+        print("=" * 50)
 
         # Test 1.1: Factorizare pentru chei mici
         print("\n--- 1.1 Factorizare Trial Division (Chei Mici) ---")
@@ -87,7 +80,7 @@ class RSACompleteTesting:
 
         # Test 1.2: Estimare complexitate Pollard Rho
         print("\n--- 1.2 Factorizare Pollard Rho ---")
-        for key_size in [64, 128]:
+        for key_size in small_key_sizes:
             n, e, d, p, q = self._generate_weak_rsa(key_size)
             print(f"\nCheia RSA {key_size} biți:")
 
@@ -138,7 +131,6 @@ class RSACompleteTesting:
                 print(f"  Timp estimat: ~10^{log10_years:.2f} ani")
 
     def _trial_division(self, n, limit=10000000):
-        """Factorizare prin împărțire succesivă"""
         if n % 2 == 0:
             return [2, n // 2]
         for i in range(3, min(int(math.sqrt(n)) + 1, limit), 2):
@@ -147,7 +139,6 @@ class RSACompleteTesting:
         return None
 
     def _pollard_rho(self, n, max_iterations=100000):
-        """Algoritmul Pollard Rho pentru factorizare"""
         if n % 2 == 0:
             return 2
 
@@ -166,20 +157,10 @@ class RSACompleteTesting:
 
         return d if d != n else None
 
-    # ============================================================================
-    # TESTAREA 2: REZISTENȚA LA ATACURI CRIPTANALITICE
-    # ============================================================================
-
     def test_2_cryptanalytic_attacks(self):
-        """
-        Testează rezistența la:
-        - Chosen-plaintext attacks
-        - Ciphertext-only attacks
-        - Analiza statistică a textelor criptate
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 2: REZISTENȚA LA ATACURI CRIPTANALITICE")
-        print("=" * 80)
+        print("\n" + "=" * 50)
+        print("TESTUL 2: REZISTENȚA LA ATACURI CRIPTANALITICE")
+        print("=" * 50)
 
         key = RSA.generate(2048)
         cipher = PKCS1_OAEP.new(key)
@@ -263,20 +244,11 @@ class RSACompleteTesting:
             entropy -= p * math.log2(p)
         return entropy
 
-    # ============================================================================
-    # TESTAREA 3: TESTAREA MANUALĂ A VULNERABILITĂȚILOR
-    # ============================================================================
-
     def test_3_vulnerability_audit(self):
-        """
-        Auditează implementarea pentru:
-        - Erori de implementare
-        - Algoritmi nesiguri
-        - Protocoale vulnerabile
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 3: TESTAREA MANUALĂ A VULNERABILITĂȚILOR")
-        print("=" * 80)
+
+        print("\n" + "=" * 50)
+        print("TESTUL 3: TESTAREA MANUALĂ A VULNERABILITĂȚILOR")
+        print("=" * 50)
 
         vulnerabilities_found = []
 
@@ -310,36 +282,17 @@ class RSACompleteTesting:
         print("Schema utilizată: PKCS1_OAEP")
         print("✓ SIGUR: OAEP este rezistent la atacuri adaptative")
 
-        # Test 3.4: Verificare Man-in-the-Middle
-        print("\n--- 3.4 Verificare Protocoale (MitM, Replay) ---")
-        print("⚠ IMPORTANT: RSA singur NU protejează împotriva:")
-        print("  - Man-in-the-Middle attacks")
-        print("  - Replay attacks")
-        print("✓ RECOMANDARE: Utilizați RSA împreună cu:")
-        print("  - Semnături digitale pentru autentificare")
-        print("  - Timestamping pentru anti-replay")
-        print("  - TLS/SSL pentru canale securizate")
-
         self.results["vulnerabilities"] = {
             "total_vulnerabilities": len(vulnerabilities_found),
             "vulnerabilities": vulnerabilities_found,
-            "safe_practices_checked": 4,
+            "safe_practices_checked": 3,
         }
 
-    # ============================================================================
-    # TESTAREA 4: SIMULĂRI ȘI ATACURI CONTROLATE
-    # ============================================================================
-
     def test_4_stress_and_penetration(self):
-        """
-        Testează în condiții de stres:
-        - Volume mari de date
-        - Cereri multiple simultane
-        - Teste de penetrare
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 4: SIMULĂRI ȘI ATACURI CONTROLATE")
-        print("=" * 80)
+
+        print("\n" + "=" * 50)
+        print("TESTUL 4: SIMULĂRI ȘI ATACURI CONTROLATE")
+        print("=" * 50)
 
         key = RSA.generate(2048)
         cipher = PKCS1_OAEP.new(key)
@@ -406,8 +359,8 @@ class RSACompleteTesting:
             }
         )
 
-        # Test 4.3: Penetration Test - Mesaje Malformate
-        print("\n--- 4.3 Penetration Test: Mesaje Malformate ---")
+        # Test 4.3: Test de rezilienta - Mesaje Malformate
+        print("\n--- 4.3 Test de rezilienta: Mesaje Malformate ---")
         malformed_inputs = [
             b"",  # Mesaj gol
             b"X",  # Mesaj prea scurt
@@ -441,20 +394,10 @@ class RSACompleteTesting:
             }
         )
 
-    # ============================================================================
-    # TESTAREA 5: CONFORMITATE CU STANDARDE
-    # ============================================================================
-
     def test_5_standards_compliance(self):
-        """
-        Verifică conformitatea cu standarde:
-        - NIST SP 800-57
-        - FIPS 186-4
-        - PCI DSS
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 5: CONFORMITATE CU STANDARDE")
-        print("=" * 80)
+        print("\n" + "=" * 50)
+        print("TESTUL 5: CONFORMITATE CU STANDARDE")
+        print("=" * 50)
 
         compliance_results = {}
 
@@ -530,86 +473,71 @@ class RSACompleteTesting:
             "passed_checks": passed_checks,
         }
 
-    # ============================================================================
-    # TESTAREA 6: PERFORMANȚA
-    # ============================================================================
-
-    def test_6_performance(self, key_sizes=[1024, 2048, 3072, 4096], iterations=10):
-        """
-        Măsoară performanța pentru:
-        - Generarea cheilor
-        - Criptare/Decriptare
-        - Consum resurse
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 6: PERFORMANȚA")
-        print("=" * 80)
+    def test_6_performance(self, key_sizes=[1024, 2048, 3072], iterations=10):
+        print("\n" + "=" * 50)
+        print("TESTUL 6: PERFORMANȚA")
+        print("=" * 50)
 
         for key_size in key_sizes:
-            print(f"\n--- Performanță Cheia {key_size} biți ---")
+            try:
+                print(f"\n--- Performanță Cheia {key_size} biți ---")
+                # 6.1: Generare chei
+                key_gen_times = []
+                for _ in range(iterations):
+                    start = time.perf_counter()
+                    RSA.generate(key_size)
+                    end = time.perf_counter()
+                    key_gen_times.append((end - start) * 1000)
 
-            # 6.1: Generare chei
-            key_gen_times = []
-            for _ in range(iterations):
-                start = time.perf_counter()
-                RSA.generate(key_size)
-                end = time.perf_counter()
-                key_gen_times.append((end - start) * 1000)
+                print(f"\nGenerare chei:")
+                print(f"  Media: {np.mean(key_gen_times):.2f} ms")
+                print(
+                    f"  Min/Max: {min(key_gen_times):.2f} / {max(key_gen_times):.2f} ms"
+                )
 
-            print(f"\nGenerare chei:")
-            print(f"  Media: {np.mean(key_gen_times):.2f} ms")
-            print(f"  Min/Max: {min(key_gen_times):.2f} / {max(key_gen_times):.2f} ms")
+                # 6.2: Criptare/Decriptare
+                key = RSA.generate(key_size)
+                cipher = PKCS1_OAEP.new(key)
+                max_msg_size = (key_size // 8) - 42
 
-            # 6.2: Criptare/Decriptare
-            key = RSA.generate(key_size)
-            cipher = PKCS1_OAEP.new(key)
-            max_msg_size = (key_size // 8) - 42
+                message = get_random_bytes(max_msg_size)
 
-            message = get_random_bytes(max_msg_size)
+                encrypt_times = []
+                decrypt_times = []
 
-            encrypt_times = []
-            decrypt_times = []
+                encrypted_msg = None
+                for _ in range(iterations):
+                    start = time.perf_counter()
+                    encrypted_msg = cipher.encrypt(message)
+                    end = time.perf_counter()
+                    encrypt_times.append((end - start) * 1000)
 
-            encrypted_msg = None
-            for _ in range(iterations):
-                start = time.perf_counter()
-                encrypted_msg = cipher.encrypt(message)
-                end = time.perf_counter()
-                encrypt_times.append((end - start) * 1000)
+                    start = time.perf_counter()
+                    cipher.decrypt(encrypted_msg)
+                    end = time.perf_counter()
+                    decrypt_times.append((end - start) * 1000)
 
-                start = time.perf_counter()
-                cipher.decrypt(encrypted_msg)
-                end = time.perf_counter()
-                decrypt_times.append((end - start) * 1000)
+                print(f"\nCriptare:")
+                print(f"  Media: {np.mean(encrypt_times):.3f} ms")
+                print(f"\nDecriptare:")
+                print(f"  Media: {np.mean(decrypt_times):.3f} ms")
 
-            print(f"\nCriptare:")
-            print(f"  Media: {np.mean(encrypt_times):.3f} ms")
-            print(f"\nDecriptare:")
-            print(f"  Media: {np.mean(decrypt_times):.3f} ms")
-
-            self.results["performance"].append(
-                {
-                    "key_size": key_size,
-                    "key_gen_time": np.mean(key_gen_times),
-                    "encrypt_time": np.mean(encrypt_times),
-                    "decrypt_time": np.mean(decrypt_times),
-                }
-            )
-
-    # ============================================================================
-    # TESTAREA 7: INTEGRITATEA
-    # ============================================================================
+                self.results["performance"].append(
+                    {
+                        "key_size": key_size,
+                        "key_gen_time": np.mean(key_gen_times),
+                        "encrypt_time": np.mean(encrypt_times),
+                        "decrypt_time": np.mean(decrypt_times),
+                    }
+                )
+                print(f"✓ Salvat rezultatul pentru {key_size} biți")
+            except Exception as e:
+                print(f"✗ Eroare la {key_size} biți: {e}")
 
     def test_7_integrity(self):
-        """
-        Verifică mecanismele de integritate:
-        - Hash functions
-        - HMAC
-        - Semnături digitale
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 7: INTEGRITATEA")
-        print("=" * 80)
+        print("\n" + "=" * 50)
+        print("TESTUL 7: INTEGRITATEA")
+        print("=" * 50)
 
         key = RSA.generate(2048)
         message = b"Mesaj important pentru verificare integritate"
@@ -711,20 +639,10 @@ class RSACompleteTesting:
         ]
         print(f"Teste trecute: {sum(integrity_tests)}/{len(integrity_tests)}")
 
-    # ============================================================================
-    # TESTAREA 8: ENTROPIA ȘI RANDOMIZARE
-    # ============================================================================
-
     def test_8_entropy_and_randomness(self, key_size=2048, num_keys=100):
-        """
-        Analizează calitatea cheilor:
-        - Entropie Shannon
-        - Distribuție biți
-        - Surse de randomizare
-        """
-        print("\n" + "=" * 80)
-        print("TESTAREA 8: ENTROPIA ȘI RANDOMIZARE")
-        print("=" * 80)
+        print("\n" + "=" * 50)
+        print("TESTUL 8: ENTROPIA ȘI RANDOMIZARE")
+        print("=" * 50)
 
         print(f"\nGenerare {num_keys} chei de {key_size} biți...")
 
@@ -788,22 +706,8 @@ class RSACompleteTesting:
             f"Interpretare: {'✓ Distribuție uniformă' if chi_square < 20 else '⚠ Posibile neuniformități'}"
         )
 
-        # Test 8.4: Sursă de randomizare
-        print("\n--- 8.4 Sursă Randomizare ---")
-        print("Bibliotecă: PyCryptodome (Crypto.Random)")
-
-        # Test validare prime
-        if primes_p and primes_q:
-            print("\n--- 8.5 Validare Prime Generate ---")
-            # Verificare că p != q
-            unique_primes = len(set(primes_p + primes_q))
-            print(f"Prime unice generate: {unique_primes}/{len(primes_p)*2}")
-            print(
-                f"p ≠ q pentru toate cheile: {'✓ DA' if unique_primes == len(primes_p)*2 else '✗ NU'}"
-            )
-
         # Test NIST randomness (simplified)
-        print("\n--- 8.6 Test NIST Randomness (Simplificat) ---")
+        print("\n--- 8.4 Test NIST Randomness (Simplificat) ---")
         test_data = get_random_bytes(1000)
 
         # Frequency test (monobit)
@@ -827,10 +731,6 @@ class RSACompleteTesting:
             "randomness_source": "CSPRNG",
         }
 
-    # ============================================================================
-    # FUNCȚII AUXILIARE
-    # ============================================================================
-
     def _generate_weak_rsa(self, bits):
         """Generare cheie RSA slabă pentru teste"""
         p = getPrime(bits // 2)
@@ -841,18 +741,8 @@ class RSACompleteTesting:
         d = inverse(e, phi)
         return n, e, d, p, q
 
-    # ============================================================================
-    # RAPORT FINAL COMPLET
-    # ============================================================================
-
     def generate_complete_report(self):
         """Generează raportul final pentru toate testările"""
-        print("\n" + "=" * 80)
-        print("RAPORT FINAL COMPLET - TESTARE RSA")
-        print("Toate cele 8 tipuri de testare")
-        print("=" * 80)
-
-        # Testarea 1
         print("\n1. EVALUAREA COMPLEXITĂȚII ALGORITMULUI:")
         if self.results["complexity"]:
             for result in self.results["complexity"]:
@@ -865,21 +755,18 @@ class RSACompleteTesting:
                     f"   {result['method']} ({result['key_size']} biți): {status} - {result['time_ms']:.2f} ms"
                 )
 
-        # Testarea 2
         print("\n2. REZISTENȚA LA ATACURI CRIPTANALITICE:")
         if self.results["cryptanalytic"]:
             for result in self.results["cryptanalytic"]:
                 status = "✓ Rezistent" if result.get("resistant") else "⚠ Vulnerabil"
                 print(f"   {result['attack_type']}: {status}")
 
-        # Testarea 3
         print("\n3. AUDIT VULNERABILITĂȚI:")
         if self.results["vulnerabilities"]:
             vuln = self.results["vulnerabilities"]
             print(f"   Vulnerabilități găsite: {vuln['total_vulnerabilities']}")
             print(f"   Practici sigure verificate: {vuln['safe_practices_checked']}")
 
-        # Testarea 4
         print("\n4. SIMULĂRI ȘI STRESS TEST:")
         if self.results["simulations"]:
             for result in self.results["simulations"]:
@@ -894,7 +781,6 @@ class RSACompleteTesting:
                         f"   Penetrare: {result['resilience_score']}/{result['total_tests']} teste"
                     )
 
-        # Testarea 5
         print("\n5. CONFORMITATE CU STANDARDE:")
         if self.results["standards"]:
             std = self.results["standards"]
@@ -905,7 +791,6 @@ class RSACompleteTesting:
                 f"   Rata conformitate: {(std['passed_checks']/std['total_checks'])*100:.1f}%"
             )
 
-        # Testarea 6
         print("\n6. PERFORMANȚĂ:")
         if self.results["performance"]:
             for result in self.results["performance"]:
@@ -914,7 +799,6 @@ class RSACompleteTesting:
                 print(f"     Criptare: {result['encrypt_time']:.3f} ms")
                 print(f"     Decriptare: {result['decrypt_time']:.3f} ms")
 
-        # Testarea 7
         print("\n7. INTEGRITATE:")
         if self.results["integrity"]:
             passed = sum(
@@ -927,7 +811,6 @@ class RSACompleteTesting:
                 f"   Teste integritate: {passed}/{len(self.results['integrity'])} trecute"
             )
 
-        # Testarea 8
         print("\n8. ENTROPIE ȘI RANDOMIZARE:")
         if self.results["entropy"]:
             ent = self.results["entropy"]
@@ -938,54 +821,231 @@ class RSACompleteTesting:
             print(f"   Chi-pătrat: {ent['chi_square']:.2f}")
             print(f"   Sursă: {ent['randomness_source']}")
 
-        print("\n" + "=" * 80)
-        print("✓ TESTARE COMPLETĂ FINALIZATĂ")
-        print("=" * 80)
+        print("\n" + "=" * 50)
 
+    def export_pdf(self, results, charts=None, filename="raport_rsa.pdf"):
+        doc = SimpleDocTemplate(filename)
+        styles = getSampleStyleSheet()
+        elements = []
 
-# ============================================================================
-# EXECUȚIE PRINCIPALĂ
-# ============================================================================
+        def save_chart(chart, name):
+            path = f"_tmp_{name}.png"
+
+            # compatibil matplotlib figure sau wrapper
+            if hasattr(chart, "fig"):
+                chart.fig.savefig(path, dpi=200, bbox_inches="tight")
+            else:
+                chart.savefig(path, dpi=200, bbox_inches="tight")
+
+            return path
+
+        def add_image(chart, label):
+            if not chart:
+                return
+
+            path = save_chart(chart, label)
+
+            if not os.path.exists(path):
+                elements.append(
+                    Paragraph(f"[Eroare: imagine lipsă {label}]", styles["Normal"])
+                )
+                return
+
+            img = Image(path)
+
+            max_width = 500
+            if img.imageWidth > 0:
+                scale = max_width / img.imageWidth
+                img.drawWidth = img.imageWidth * scale
+                img.drawHeight = img.imageHeight * scale
+
+            elements.append(Spacer(1, 10))
+            elements.append(img)
+
+        # TITLE
+        elements.append(Paragraph("Raport Complet Testare RSA", styles["Title"]))
+        elements.append(Spacer(1, 12))
+
+        # 1. Complexitate
+        elements.append(Paragraph("1. Evaluarea Complexitatii", styles["Heading2"]))
+
+        for r in results.get("complexity", []):
+            status = "✓ Factorizat" if r.get("factorized") else "✗ Nu s-a factorizat"
+            txt = f"{r['method']} ({r['key_size']} biti): {status} - {r['time_ms']:.2f} ms"
+            elements.append(Paragraph(txt, styles["Normal"]))
+
+        add_image(charts[0] if charts else None, "complexitate")
+
+        # 2. Atacuri criptanalitice
+        elements.append(Paragraph("2. Rezistenta la Atacuri", styles["Heading2"]))
+
+        for r in results.get("cryptanalytic", []):
+            status = "✓ Rezistent" if r.get("resistant") else "⚠ Vulnerabil"
+            elements.append(
+                Paragraph(f"{r['attack_type']}: {status}", styles["Normal"])
+            )
+
+        add_image(charts[1] if charts else None, "atacuri")
+
+        # 3. Vulnerabilități
+        elements.append(Paragraph("3. Audit Vulnerabilitati", styles["Heading2"]))
+
+        vuln = results.get("vulnerabilities", {})
+        if vuln:
+            elements.append(
+                Paragraph(
+                    f"Vulnerabilitati: {vuln.get('total_vulnerabilities', 0)}",
+                    styles["Normal"],
+                )
+            )
+            elements.append(
+                Paragraph(
+                    f"Practici sigure: {vuln.get('safe_practices_checked', 0)}",
+                    styles["Normal"],
+                )
+            )
+
+        add_image(charts[2] if charts else None, "vulnerabilitati")
+
+        # 4. Simulări
+        elements.append(Paragraph("4. Simulari si Stress Test", styles["Heading2"]))
+
+        for r in results.get("simulations", []):
+            if r["test"] == "stress_volume":
+                elements.append(
+                    Paragraph(
+                        f"Volume mari: {r['success_rate']*100:.1f}% succes",
+                        styles["Normal"],
+                    )
+                )
+            elif r["test"] == "stability":
+                elements.append(
+                    Paragraph(
+                        f"Stabilitate: {'✓' if r['stable'] else '✗'}", styles["Normal"]
+                    )
+                )
+            elif r["test"] == "penetration_malformed":
+                elements.append(
+                    Paragraph(
+                        f"Penetrare: {r['resilience_score']}/{r['total_tests']}",
+                        styles["Normal"],
+                    )
+                )
+
+        add_image(charts[3] if charts else None, "simulari")
+
+        # 5. Standarde
+        elements.append(Paragraph("5. Conformitate Standarde", styles["Heading2"]))
+
+        std = results.get("standards", {})
+        if std:
+            elements.append(
+                Paragraph(
+                    f"Verificari: {std.get('passed_checks', 0)}/{std.get('total_checks', 0)}",
+                    styles["Normal"],
+                )
+            )
+
+        add_image(charts[4] if charts else None, "standarde")
+
+        # 6. Performanță
+        elements.append(Paragraph("6. Performanta", styles["Heading2"]))
+
+        for r in results.get("performance", []):
+            elements.append(Paragraph(f"Cheie {r['key_size']} biti:", styles["Normal"]))
+            elements.append(
+                Paragraph(f"Generare: {r['key_gen_time']:.2f} ms", styles["Normal"])
+            )
+            elements.append(
+                Paragraph(f"Criptare: {r['encrypt_time']:.3f} ms", styles["Normal"])
+            )
+            elements.append(
+                Paragraph(f"Decriptare: {r['decrypt_time']:.3f} ms", styles["Normal"])
+            )
+
+        add_image(charts[5] if charts else None, "performanta")
+
+        # 7. Integritate
+        elements.append(Paragraph("7. Integritate", styles["Heading2"]))
+
+        passed = sum(
+            1
+            for r in results.get("integrity", [])
+            if r.get("passed")
+            or (r.get("signature_valid") and r.get("tamper_detected"))
+        )
+
+        elements.append(
+            Paragraph(
+                f"Teste trecute: {passed}/{len(results.get('integrity', []))}",
+                styles["Normal"],
+            )
+        )
+
+        add_image(charts[6] if charts else None, "integritate")
+
+        # 8. Entropie
+        elements.append(Paragraph("8. Entropie si Randomizare", styles["Heading2"]))
+
+        ent = results.get("entropy", {})
+        if ent:
+            elements.append(
+                Paragraph(
+                    f"Distribuție biți: {ent.get('bit_distribution_mean', 0):.4f}",
+                    styles["Normal"],
+                )
+            )
+            elements.append(
+                Paragraph(
+                    f"Entropie: {ent.get('entropy_mean', 0):.4f}", styles["Normal"]
+                )
+            )
+            elements.append(
+                Paragraph(
+                    f"Chi-pătrat: {ent.get('chi_square', 0):.2f}", styles["Normal"]
+                )
+            )
+
+        add_image(charts[7] if charts else None, "entropie")
+
+        # BUILD PDF
+        doc.build(elements)
+
+        # cleanup
+        for name in [
+            "complexitate",
+            "atacuri",
+            "vulnerabilitati",
+            "simulari",
+            "standarde",
+            "performanta",
+            "integritate",
+            "entropie",
+        ]:
+            path = f"_tmp_{name}.png"
+            if os.path.exists(path):
+                os.remove(path)
 
 
 def main():
-    """Execută toate cele 8 tipuri de testare"""
-    print("=" * 80)
-    print("SET COMPLET DE TESTARE RSA")
-    print("Implementare completă a tuturor celor 8 tipuri de testare")
-    print("=" * 80)
+    print("=" * 50)
+    print("Testarea Algoritmului RSA")
+    print("=" * 50)
 
     suite = RSACompleteTesting()
 
     try:
-        # Testarea 1: Evaluarea complexității
         suite.test_1_complexity_evaluation()
-
-        # Testarea 2: Rezistența la atacuri criptanalitice
         suite.test_2_cryptanalytic_attacks()
-
-        # Testarea 3: Audit vulnerabilități
         suite.test_3_vulnerability_audit()
-
-        # Testarea 4: Simulări și stress test
         suite.test_4_stress_and_penetration()
-
-        # Testarea 5: Conformitate cu standarde
         suite.test_5_standards_compliance()
-
-        # Testarea 6: Performanță
         suite.test_6_performance(key_sizes=[1024, 2048, 3072], iterations=5)
-
-        # Testarea 7: Integritate
         suite.test_7_integrity()
-
-        # Testarea 8: Entropie și randomizare
         suite.test_8_entropy_and_randomness(key_size=2048, num_keys=50)
-
-        # Raport final complet
         suite.generate_complete_report()
 
-        print("\n✓ Toate cele 8 tipuri de testare au fost executate cu succes!")
+        print("\n✓ Toate cele 8 tipuri de teste au fost executate cu succes!")
         print("\nPentru mai multe detalii, vezi secțiunile individuale de mai sus.")
 
     except Exception as e:

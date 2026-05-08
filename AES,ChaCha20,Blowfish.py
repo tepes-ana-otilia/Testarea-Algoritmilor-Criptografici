@@ -1,12 +1,14 @@
 import os
 import time
 import psutil
+
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.decrepit.ciphers.algorithms import Blowfish
 
-
-# Generăm un mesaj mare (~1MB)
-message = os.urandom(1024 * 1024)
+# Buffer mic reutilizat de multe ori
+chunk = os.urandom(1024 * 1024)  # 1MB
+REPEAT_COUNT = 10000  # ~10GB procesati logic
 
 
 def measure_encryption(algorithm, key, nonce_or_iv):
@@ -24,13 +26,16 @@ def measure_encryption(algorithm, key, nonce_or_iv):
         )
     elif algorithm == "Blowfish":
         cipher = Cipher(
-            algorithms.Blowfish(key), modes.CFB(nonce_or_iv), backend=default_backend()
+            Blowfish(key), modes.CFB(nonce_or_iv), backend=default_backend()
         )
     else:
         return None
 
     encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(message) + encryptor.finalize()
+    for _ in range(REPEAT_COUNT):
+        ciphertext = encryptor.update(chunk)
+
+    encryptor.finalize()
     duration = time.time() - start
     end_mem = process.memory_info().rss
     mem_used = end_mem - start_mem

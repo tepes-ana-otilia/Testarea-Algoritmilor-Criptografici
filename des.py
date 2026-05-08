@@ -4,8 +4,8 @@ from Crypto.Util.Padding import pad
 import time
 import os
 
-# Citire fișier existent (10MB)
-with open("testfile_10mb.bin", "rb") as f:
+# Citire fișier existent
+with open("testfile_2gb.bin", "rb") as f:  # 2GB
     file_data = f.read()
 
 # DES setup (ECB)

@@ -4,12 +4,12 @@ from Crypto.Util.Padding import pad
 import time
 import os
 
-# Generare fișier de test (10MB)
-with open("testfile_10mb.bin", "wb") as f:
-    f.write(os.urandom(10 * 1024 * 1024))  # 10MB
+# Generare fișier de test
+with open("testfile_2gb.bin", "wb") as f:
+    f.write(os.urandom(2 * 1024 * 1024 * 1024))  # 2GB
 
 # Citire fișier
-with open("testfile_10mb.bin", "rb") as f:
+with open("testfile_2gb.bin", "rb") as f:
     file_data = f.read()
 
 # AES setup (ECB)
